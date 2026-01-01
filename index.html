@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaiChiApp</title>
+    <style>
+        :root { --accent: #81C784; --rest: #FFB74D; --bg: #1A1A1A; --card: #2D2D2D; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 20px; text-align: center; }
+        .hidden { display: none !important; }
+        
+        /* Menu Styling */
+        .menu-item { background: var(--card); padding: 25px; border-radius: 15px; margin-bottom: 15px; border-left: 5px solid var(--accent); cursor: pointer; }
+        .menu-item h2 { margin: 0; color: var(--accent); }
+        
+        /* Timer Styling */
+        .timer-screen { max-width: 400px; margin: 0 auto; }
+        #display { font-size: 7rem; font-weight: bold; margin: 20px 0; font-variant-numeric: tabular-nums; }
+        #ex-name { font-size: 2.2rem; color: var(--accent); min-height: 3rem; margin-bottom: 10px; }
+        #phase-label { font-size: 1.2rem; letter-spacing: 3px; color: #888; text-transform: uppercase; }
+        
+        button { width: 100%; padding: 20px; font-size: 1.2rem; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-main { background: var(--accent); color: #1A1A1A; }
+        .btn-back { background: #444; color: white; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <div id="menu-screen">
+        <h1>Tai Chi Sessions</h1>
+        <div id="session-list"></div>
+    </div>
+
+    <div id="timer-screen" class="timer-screen hidden">
+        <div id="phase-label">Get Ready</div>
+        <div id="ex-name">Loading...</div>
+        <div id="display">00:00</div>
+        <div id="progress" style="color: #666;">Exercise 1 of X</div>
+        
+        <button class="btn-main" id="startBtn" onclick="toggleTimer()">START</button>
+        <button class="btn-back" onclick="goToMenu()">QUIT SESSION</button>
+    </div>
+
+    <script>
+        // --- DATA STRUCTURE ---
+        const sessions = [
+            {
+                title: "9 Flow",
+                exercises: [
+                    { name: "Swinging Arms", work: 60, rest: 10 },
+                    { name: "Opening Posture", work: 60, rest: 5 },
+                    { name: "Painting the Rainbow", work: 60, rest: 5 }
+                ]
+            },
+            {
+                title: "7 Flow",
+                exercises: [
+                    { name: "Cloud Hands", work: 45, rest: 10 },
+                    { name: "Pushing Waves", work: 45, rest: 5 }
+                ]
+            },
+            {
+                title: "Full Flow",
+                exercises: [
+                    { name: "Complete Sequence", work: 300, rest: 15 }
+                ]
+            }
+        ];
+
+        let currentSession = null;
+        let currentIndex = 0;
+        let timeLeft = 0;
+        let isWorking = false; // False = Prep/Rest phase, True = Exercise phase
+        let timerId = null;
+        const chime = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
+
+        function loadMenu() {
+            const list = document.getElementById('session-list');
+            sessions.forEach((s, idx) => {
+                const div = document.createElement('div');
+                div.className = 'menu-item';
+                div.onclick = () => selectSession(idx);
+                div.innerHTML = `<h2>${s.title}</h2><p>${s.exercises.length} Exercises</p>`;
+                list.appendChild(div);
+            });
+        }
+
+        function selectSession(idx) {
+            currentSession = sessions[idx];
+            currentIndex = 0;
+            prepareNextExercise();
+            document.getElementById('menu-screen').classList.add('hidden');
+            document.getElementById('timer-screen').classList.remove('hidden');
+        }
+
+        function prepareNextExercise() {
+            isWorking = false; // Start with the rest/prep period
+            const ex = currentSession.exercises[currentIndex];
+            timeLeft = ex.rest;
+            updateUI("GET READY", var(--rest));
+        }
+
+        function toggleTimer() {
+            if (timerId) {
+                clearInterval(timerId);
+                timerId = null;
+                document.getElementById('startBtn').innerText = "RESUME";
+            } else {
+                document.getElementById('startBtn').innerText = "PAUSE";
+                timerId = setInterval(tick, 1000);
+            }
+        }
+
+        function tick() {
+            if (timeLeft > 0) {
+                timeLeft--;
+            } else {
+                chime.play();
+                if (!isWorking) {
+                    // Prep finished -> Start Exercise
+                    isWorking = true;
+                    timeLeft = currentSession.exercises[currentIndex].work;
+                } else {
+                    // Exercise finished -> Move to next
+                    currentIndex++;
+                    if (currentIndex < currentSession.exercises.length) {
+                        prepareNextExercise();
+                    } else {
+                        return finishSession();
+                    }
+                }
+            }
+            updateUI();
+        }
+
+        function updateUI() {
+            const ex = currentSession.exercises[currentIndex];
+            const label = isWorking ? "GO" : "PREP";
+            const color = isWorking ? "#81C784" : "#FFB74D";
+            
+            document.getElementById('phase-label').innerText = label;
+            document.getElementById('ex-name').innerText = ex.name;
+            document.getElementById('ex-name').style.color = color;
+            document.getElementById('display').innerText = `00:${timeLeft.toString().padStart(2, '0')}`;
+            document.getElementById('progress').innerText = `Step ${currentIndex + 1} of ${currentSession.exercises.length}`;
+        }
+
+        function finishSession() {
+            clearInterval(timerId);
+            timerId = null;
+            document.getElementById('phase-label').innerText = "DONE";
+            document.getElementById('ex-name').innerText = "Session Finished";
+            document.getElementById('ex-name').style.color = "white";
+            document.getElementById('display').innerText = "00:00";
+            document.getElementById('startBtn').innerText = "START AGAIN";
+            currentIndex = 0;
+        }
+
+        function goToMenu() {
+            location.reload(); 
+        }
+
+        loadMenu();
+    </script>
+</body>
+</html>
