@@ -47,105 +47,27 @@
             {
                 title: "9 Flow Routine",
                 exercises: [
-                    {
-                        name: "Up and Down Together",
-                        work: 30,
-                        prep: 5,
-                        description: "Rising up with the arms while simultaneously lifting up the calves."
-                    },
-                    {
-                        name: "Rising Knee Twist",
-                        work: 30,
-                        prep: 5,
-                        description: "Twisting motions while balancing on one side to get blood moving."
-                    },
-                    {
-                        name: "Golden Turtle in the Water",
-                        work: 30,
-                        prep: 5,
-                        description: "Wide stance; reach down to touch the alternate foot with the hand."
-                    },
-                    {
-                        name: "Bodyweight Lifts",
-                        work: 30,
-                        prep: 5,
-                        description: "Tilt hips back with arms forward, then thrust forward and rise onto calves."
-                    },
-                    {
-                        name: "Knee Bend Toe Touches",
-                        work: 30,
-                        prep: 5,
-                        description: "Side lunge motion touching the alternate foot while keeping the extended leg straight."
-                    },
-                    {
-                        name: "Torso Twist",
-                        work: 30,
-                        prep: 5,
-                        description: "Spin and look behind you with loose arms wrapping around the body to open the fascia."
-                    },
-                    {
-                        name: "Spread Your Wings",
-                        work: 30,
-                        prep: 5,
-                        description: "Move the arms in a backwards circular motion."
-                    },
-                    {
-                        name: "Squats",
-                        work: 30,
-                        prep: 5,
-                        description: "Drop down to a full 90-degree angle with a wide leg stance."
-                    },
-                    {
-                        name: "Forward Back Clap",
-                        work: 30,
-                        prep: 5,
-                        description: "Relaxed front-and-back clapping to increase heart rate and blood flow."
-                    }
-                    title: "7-Minute Tai Chi Routine",
-            description: "Seven moves in seven minutes to boost energy naturally [1].",
-            exercises: [
-                { 
-                    name: "Hops", 
-                    work: 45, 
-                    prep: 5, 
-                    description: "Lightly jumping up and down with relaxed shoulders to release tension [1]." 
-                },
-                { 
-                    name: "Alternating Arms", 
-                    work: 60, 
-                    prep: 5, 
-                    description: "Moving arms up and down in an alternating rhythm [1]." 
-                },
-                { 
-                    name: "Dead Arms", 
-                    work: 60, 
-                    prep: 5, 
-                    description: "Twisting shoulders with loose arms slapping the body to loosen fascia [1]." 
-                },
-                { 
-                    name: "Standing Prayer Twist", 
-                    work: 60, 
-                    prep: 5, 
-                    description: "Twisting from left to right with prayer hands while keeping the head facing forward [1]." 
-                },
-                { 
-                    name: "Bent Over Twist", 
-                    work: 60, 
-                    prep: 5, 
-                    description: "Twisting 180 degrees with arms straight while looking down at the ground [1]." 
-                },
-                { 
-                    name: "Marches", 
-                    work: 60, 
-                    prep: 5, 
-                    description: "High-intensity marches, bringing knees up and slapping kneecaps with hands [1]." 
-                },
-                { 
-                    name: "Body Waves", 
-                    work: 60, 
-                    prep: 5, 
-                    description: "Raising arms up and 'whooshing' them down as if throwing a ball to the ground [1]." 
-                }
+                    { name: "Up and Down Together", work: 30, prep: 5, description: "Rising up with the arms while simultaneously lifting up the calves." },
+                    { name: "Rising Knee Twist", work: 30, prep: 5, description: "Twisting motions while balancing on one side to get blood moving." },
+                    { name: "Golden Turtle in the Water", work: 30, prep: 5, description: "Wide stance; reach down to touch the alternate foot with the hand." },
+                    { name: "Bodyweight Lifts", work: 30, prep: 5, description: "Tilt hips back with arms forward, then thrust forward and rise onto calves." },
+                    { name: "Knee Bend Toe Touches", work: 30, prep: 5, description: "Side lunge motion touching the alternate foot while keeping the extended leg straight." },
+                    { name: "Torso Twist", work: 30, prep: 5, description: "Spin and look behind you with loose arms wrapping around the body to open the fascia." },
+                    { name: "Spread Your Wings", work: 30, prep: 5, description: "Move the arms in a backwards circular motion." },
+                    { name: "Squats", work: 30, prep: 5, description: "Drop down to a full 90-degree angle with a wide leg stance." },
+                    { name: "Forward Back Clap", work: 30, prep: 5, description: "Relaxed front-and-back clapping to increase heart rate and blood flow." }
+                ]
+            },
+            {
+                title: "7-Minute Tai Chi Routine",
+                exercises: [
+                    { name: "Hops", work: 45, prep: 5, description: "Lightly jumping up and down with relaxed shoulders to release tension." },
+                    { name: "Alternating Arms", work: 60, prep: 5, description: "Moving arms up and down in an alternating rhythm." },
+                    { name: "Dead Arms", work: 60, prep: 5, description: "Twisting shoulders with loose arms slapping the body to loosen fascia." },
+                    { name: "Standing Prayer Twist", work: 60, prep: 5, description: "Twisting from left to right with prayer hands while keeping the head facing forward." },
+                    { name: "Bent Over Twist", work: 60, prep: 5, description: "Twisting 180 degrees with arms straight while looking down at the ground." },
+                    { name: "Marches", work: 60, prep: 5, description: "High-intensity marches, bringing knees up and slapping kneecaps with hands." },
+                    { name: "Body waves", work: 60, prep: 5, description: "Raising arms up and 'whooshing' them down as if throwing a ball to the ground." }
                 ]
             }
         ];
@@ -157,6 +79,7 @@
         let timerId = null;
         const chime = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
 
+        // Draw the menu
         const list = document.getElementById('session-list');
         sessions.forEach((s, idx) => {
             const div = document.createElement('div');
@@ -182,45 +105,4 @@
 
         function toggleTimer() {
             if (timerId) {
-                clearInterval(timerId);
-                timerId = null;
-                document.getElementById('startBtn').innerText = "RESUME";
-            } else {
-                document.getElementById('startBtn').innerText = "PAUSE";
-                timerId = setInterval(tick, 1000);
-            }
-        }
-
-        function tick() {
-            if (timeLeft > 0) {
-                timeLeft--;
-            } else {
-                chime.play();
-                if (!isWorking) {
-                    isWorking = true;
-                    timeLeft = currentExList[currentIndex].work;
-                } else {
-                    currentIndex++;
-                    if (currentIndex < currentExList.length) {
-                        setupExercise();
-                    } else {
-                        return finish();
-                    }
-                }
-            }
-            updateUI();
-        }
-
-        function updateUI() {
-            const ex = currentExList[currentIndex];
-            document.getElementById('ex-name').innerText = ex.name;
-            document.getElementById('ex-desc').innerText = ex.description;
-            document.getElementById('phase').innerText = isWorking ? "EXERCISE" : "PREP";
-            document.getElementById('phase').style.color = isWorking ? "var(--accent)" : "var(--prep)";
-            document.getElementById('display').innerText = `00:${timeLeft.toString().padStart(2, '0')}`;
-            document.getElementById('progress').innerText = `Step ${currentIndex + 1} of ${currentExList.length}`;
-        }
-
-        function finish() {
-            clearInterval(timerId);
-            document.getElementById('phase').innerText = "FINISHED";
+                clearInterval(timerId
