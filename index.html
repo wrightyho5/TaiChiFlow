@@ -7,11 +7,18 @@
         :root { --accent: #81C784; --prep: #FFB74D; --bg: #1A1A1A; --card: #2D2D2D; }
         body { font-family: sans-serif; background: var(--bg); color: white; margin: 0; padding: 20px; text-align: center; }
         .hidden { display: none !important; }
-        .menu-item { background: var(--card); padding: 25px; border-radius: 15px; margin-bottom: 15px; cursor: pointer; border: 1px solid #444; display: block; width: 100%; box-sizing: border-box; }
+        
+        /* Menu */
+        .menu-item { background: var(--card); padding: 25px; border-radius: 15px; margin-bottom: 15px; cursor: pointer; border: 1px solid #444; text-align: left; }
         .menu-item h2 { margin: 0; color: var(--accent); }
-        #display { font-size: 7rem; font-weight: bold; margin: 10px 0; font-variant-numeric: tabular-nums; }
-        #ex-name { font-size: 2rem; color: var(--accent); min-height: 2.5rem; margin-top: 20px; font-weight: bold; }
-        #phase { font-size: 1.2rem; letter-spacing: 2px; color: #888; margin-top: 10px; }
+        .menu-item p { margin: 5px 0 0; color: #888; font-size: 0.9rem; }
+        
+        /* Timer Screen */
+        #ex-name { font-size: 2.2rem; color: var(--accent); font-weight: bold; margin-top: 20px; line-height: 1.2; }
+        #ex-desc { font-size: 1.1rem; color: #BBB; font-style: italic; min-height: 3rem; margin-top: 10px; padding: 0 10px; line-height: 1.4; }
+        #phase { font-size: 1.2rem; letter-spacing: 2px; color: #888; margin-top: 15px; text-transform: uppercase; }
+        #display { font-size: 7rem; font-weight: bold; margin: 5px 0; font-variant-numeric: tabular-nums; }
+        
         button { width: 100%; padding: 20px; font-size: 1.2rem; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; }
         .btn-start { background: var(--accent); color: #1A1A1A; margin-top: 20px; }
         .btn-back { background: #444; color: white; margin-top: 15px; }
@@ -21,20 +28,12 @@
 
     <div id="menu-screen">
         <h1 style="margin-bottom: 30px;">Tai Chi Sessions</h1>
-        
-        <div class="menu-item" onclick="selectSession(0)">
-            <h2>9 Flow</h2>
-            <p>3 Steps • 60s Work</p>
-        </div>
-
-        <div class="menu-item" onclick="selectSession(1)">
-            <h2>7 Flow</h2>
-            <p>2 Steps • 45s Work</p>
-        </div>
+        <div id="session-list"></div>
     </div>
 
     <div id="timer-screen" class="hidden">
         <div id="ex-name">---</div>
+        <div id="ex-desc">---</div>
         <div id="phase">GET READY</div>
         <div id="display">00:00</div>
         <div id="progress" style="color: #666;">Step 1 of X</div>
@@ -46,18 +45,62 @@
     <script>
         const sessions = [
             {
-                title: "9 Flow",
+                title: "9 Flow Routine",
                 exercises: [
-                    { name: "Swinging Arms", work: 60, prep: 10 },
-                    { name: "Opening Posture", work: 60, prep: 10 },
-                    { name: "Painting Rainbows", work: 60, prep: 5 }
-                ]
-            },
-            {
-                title: "7 Flow",
-                exercises: [
-                    { name: "Cloud Hands", work: 45, prep: 10 },
-                    { name: "Pushing Waves", work: 45, prep: 5 }
+                    {
+                        name: "Up and Down Together",
+                        work: 30,
+                        prep: 10,
+                        description: "Rising up with the arms while simultaneously lifting up the calves."
+                    },
+                    {
+                        name: "Rising Knee Twist",
+                        work: 30,
+                        prep: 10,
+                        description: "Twisting motions while balancing on one side to get blood moving."
+                    },
+                    {
+                        name: "Golden Turtle in the Water",
+                        work: 30,
+                        prep: 5,
+                        description: "Wide stance; reach down to touch the alternate foot with the hand."
+                    },
+                    {
+                        name: "Bodyweight Lifts",
+                        work: 30,
+                        prep: 10,
+                        description: "Tilt hips back with arms forward, then thrust forward and rise onto calves."
+                    },
+                    {
+                        name: "Knee Bend Toe Touches",
+                        work: 30,
+                        prep: 5,
+                        description: "Side lunge motion touching the alternate foot while keeping the extended leg straight."
+                    },
+                    {
+                        name: "Torso Twist",
+                        work: 30,
+                        prep: 5,
+                        description: "Spin and look behind you with loose arms wrapping around the body to open the fascia."
+                    },
+                    {
+                        name: "Spread Your Wings",
+                        work: 30,
+                        prep: 5,
+                        description: "Move the arms in a backwards circular motion."
+                    },
+                    {
+                        name: "Squats",
+                        work: 30,
+                        prep: 10,
+                        description: "Drop down to a full 90-degree angle with a wide leg stance."
+                    },
+                    {
+                        name: "Forward Back Clap",
+                        work: 30,
+                        prep: 5,
+                        description: "Relaxed front-and-back clapping to increase heart rate and blood flow."
+                    }
                 ]
             }
         ];
@@ -68,6 +111,15 @@
         let isWorking = false; 
         let timerId = null;
         const chime = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
+
+        const list = document.getElementById('session-list');
+        sessions.forEach((s, idx) => {
+            const div = document.createElement('div');
+            div.className = 'menu-item';
+            div.onclick = () => selectSession(idx);
+            div.innerHTML = `<h2>${s.title}</h2><p>${s.exercises.length} Movements • Warm-up Flow</p>`;
+            list.appendChild(div);
+        });
 
         function selectSession(idx) {
             currentExList = sessions[idx].exercises;
@@ -117,6 +169,7 @@
         function updateUI() {
             const ex = currentExList[currentIndex];
             document.getElementById('ex-name').innerText = ex.name;
+            document.getElementById('ex-desc').innerText = ex.description;
             document.getElementById('phase').innerText = isWorking ? "EXERCISE" : "PREP";
             document.getElementById('phase').style.color = isWorking ? "var(--accent)" : "var(--prep)";
             document.getElementById('display').innerText = `00:${timeLeft.toString().padStart(2, '0')}`;
@@ -126,9 +179,3 @@
         function finish() {
             clearInterval(timerId);
             document.getElementById('phase').innerText = "FINISHED";
-            document.getElementById('display').innerText = "00:00";
-            document.getElementById('startBtn').classList.add('hidden');
-        }
-    </script>
-</body>
-</html>
