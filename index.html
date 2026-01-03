@@ -105,4 +105,55 @@
 
         function toggleTimer() {
             if (timerId) {
-                clearInterval(timerId
+                clearInterval(timerId);
+                timerId = null;
+                document.getElementById('startBtn').innerText = "RESUME";
+            } else {
+                document.getElementById('startBtn').innerText = "PAUSE";
+                timerId = setInterval(tick, 1000);
+            }
+        }
+
+        function tick() {
+            if (timeLeft > 0) {
+                timeLeft--;
+            } else {
+                chime.play();
+                if (!isWorking) {
+                    isWorking = true;
+                    timeLeft = currentExList[currentIndex].work;
+                } else {
+                    currentIndex++;
+                    if (currentIndex < currentExList.length) {
+                        setupExercise();
+                    } else {
+                        finish();
+                        return;
+                    }
+                }
+            }
+            updateUI();
+        }
+
+        function updateUI() {
+            const ex = currentExList[currentIndex];
+            document.getElementById('ex-name').innerText = ex.name;
+            document.getElementById('ex-desc').innerText = ex.description;
+            document.getElementById('phase').innerText = isWorking ? "EXERCISE" : "PREP";
+            document.getElementById('phase').style.color = isWorking ? "var(--accent)" : "var(--prep)";
+            document.getElementById('display').innerText = `00:${timeLeft.toString().padStart(2, '0')}`;
+            document.getElementById('progress').innerText = `Step ${currentIndex + 1} of ${currentExList.length}`;
+        }
+
+        function finish() {
+            clearInterval(timerId);
+            timerId = null;
+            document.getElementById('phase').innerText = "FINISHED";
+            document.getElementById('ex-name').innerText = "Session Complete";
+            document.getElementById('ex-desc').innerText = "Well done!";
+            document.getElementById('display').innerText = "00:00";
+            document.getElementById('startBtn').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
