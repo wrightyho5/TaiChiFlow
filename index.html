@@ -100,4 +100,112 @@
                     { name: "Golden Turtle", work: 30, prep: 5, description: "Wide stance; touch alternate foot." },
                     { name: "Bodyweight Lifts", work: 30, prep: 8, description: "Tilt hips back, thrust forward onto calves." },
                     { name: "Torso Twist", work: 30, prep: 5, description: "Spin and look behind you with loose arms." },
-                    { name: "Spread Your Wings", work: 30, prep: 5, description: "Move the arms in a
+                    { name: "Spread Your Wings", work: 30, prep: 5, description: "Move the arms in a backwards circular motion." },
+                    { name: "Squats", work: 30, prep: 7, description: "Full 90-degree angle with a wide leg stance." },
+                    { name: "Golf Swing", work: 30, prep: 5, description: "Golf swings, knee slight bend and twist." },
+                    { name: "Bent Over Twist", work: 30, prep: 5, description: "Twisting 180 degrees looking at the ground." },
+                    { name: "Forward Back Clap", work: 30, prep: 5, description: "Relaxed front-and-back clapping." }
+                ]
+            }
+        ];
+
+        let currentExList = [];
+        let currentIndex = 0;
+        let timeLeft = 0;
+        let isWorking = false; 
+        let timerId = null;
+        const chime = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
+
+        // This ensures the menu loads correctly when the page opens
+        window.onload = function() {
+            const list = document.getElementById('session-list');
+            list.innerHTML = ""; // Clear existing
+            sessions.forEach((s, idx) => {
+                const div = document.createElement('div');
+                div.className = 'menu-item';
+                div.onclick = () => selectSession(idx);
+                div.innerHTML = `<h2>${s.title}</h2><p>${s.exercises.length} Movements • Tap to Start</p>`;
+                list.appendChild(div);
+            });
+        };
+
+        function selectSession(idx) {
+            currentExList = sessions[idx].exercises;
+            currentIndex = 0;
+            setupExercise();
+            document.getElementById('menu-screen').classList.add('hidden');
+            document.getElementById('timer-screen').classList.remove('hidden');
+        }
+
+        function setupExercise() {
+            isWorking = false;
+            timeLeft = currentExList[currentIndex].prep;
+            updateUI();
+        }
+
+        function skipExercise() {
+            if (currentIndex < currentExList.length - 1) {
+                currentIndex++;
+                setupExercise();
+            } else {
+                finish();
+            }
+        }
+
+        function prevExercise() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                setupExercise();
+            }
+        }
+
+        function toggleTimer() {
+            if (timerId) {
+                clearInterval(timerId);
+                timerId = null;
+                document.getElementById('startBtn').innerText = "RESUME";
+            } else {
+                document.getElementById('startBtn').innerText = "PAUSE";
+                timerId = setInterval(tick, 1000);
+            }
+        }
+
+        function tick() {
+            if (timeLeft > 0) {
+                timeLeft--;
+            } else {
+                try { chime.play(); } catch(e) {}
+                if (!isWorking) {
+                    isWorking = true;
+                    timeLeft = currentExList[currentIndex].work;
+                } else {
+                    skipExercise();
+                    return;
+                }
+            }
+            updateUI();
+        }
+
+        function updateUI() {
+            const ex = currentExList[currentIndex];
+            document.getElementById('ex-name').innerText = ex.name;
+            document.getElementById('ex-desc').innerText = ex.description;
+            document.getElementById('phase').innerText = isWorking ? "EXERCISE" : "PREP";
+            document.getElementById('phase').style.color = isWorking ? "var(--accent)" : "var(--prep)";
+            document.getElementById('display').innerText = `00:${timeLeft.toString().padStart(2, '0')}`;
+            document.getElementById('progress').innerText = `Step ${currentIndex + 1} of ${currentExList.length}`;
+        }
+
+        function finish() {
+            if (timerId) clearInterval(timerId);
+            timerId = null;
+            document.getElementById('phase').innerText = "FINISHED";
+            document.getElementById('ex-name').innerText = "Session Complete";
+            document.getElementById('ex-desc').innerText = "Well done!";
+            document.getElementById('display').innerText = "00:00";
+            document.getElementById('startBtn').classList.add('hidden');
+            document.getElementById('navRow').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
