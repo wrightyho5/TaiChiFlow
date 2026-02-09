@@ -15,13 +15,20 @@
         
         /* Timer Screen */
         #ex-name { font-size: 2.2rem; color: var(--accent); font-weight: bold; margin-top: 20px; line-height: 1.2; }
-        #ex-desc { font-size: 1.7rem; color: #BBB; font-style: italic; min-height: 3rem; margin-top: 10px; padding: 0 10px; line-height: 1.4; }
+        #ex-desc { font-size: 1.5rem; color: #AAA; font-style: italic; min-height: 3rem; margin-top: 10px; padding: 0 10px; line-height: 1.4; }
         #phase { font-size: 1.5rem; letter-spacing: 2px; color: #888; margin-top: 15px; text-transform: uppercase; }
         #display { font-size: 7rem; font-weight: bold; margin: 5px 0; font-variant-numeric: tabular-nums; }
         
+        /* BIGGER PROGRESS TEXT */
+        #progress { font-size: 1.8rem; font-weight: bold; color: #DDD; margin: 15px 0; }
+        
         button { width: 100%; padding: 20px; font-size: 1.2rem; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; }
-        .btn-start { background: var(--accent); color: #1A1A1A; margin-top: 20px; }
+        .btn-start { background: var(--accent); color: #1A1A1A; margin-top: 10px; }
         .btn-back { background: #444; color: white; margin-top: 15px; }
+
+        /* Navigation Row */
+        .nav-row { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-nav { background: #333; color: white; padding: 15px; font-size: 1rem; flex: 1; }
     </style>
 </head>
 <body>
@@ -36,9 +43,16 @@
         <div id="ex-desc">---</div>
         <div id="phase">GET READY</div>
         <div id="display">00:00</div>
-        <div id="progress" style="color: #666;">Step 1 of X</div>
+        
+        <div id="progress">Step 1 of X</div>
         
         <button class="btn-start" id="startBtn" onclick="toggleTimer()">START SESSION</button>
+
+        <div class="nav-row">
+            <button class="btn-nav" onclick="prevExercise()">← PREV</button>
+            <button class="btn-nav" onclick="skipExercise()">SKIP →</button>
+        </div>
+
         <button class="btn-back" onclick="location.reload()">BACK TO MENU</button>
     </div>
 
@@ -70,7 +84,7 @@
                     { name: "Push Ups", work: 90, prep: 5, description: "40-50" }
                 ]
             },
-              {
+            {
                 title: "7-Minute Tai Chi Routine",
                 exercises: [
                     { name: "Hops", work: 45, prep: 5, description: "Lightly jumping up and down with relaxed shoulders to release tension." },
@@ -113,7 +127,6 @@
         let timerId = null;
         const chime = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
 
-        // Draw the menu
         const list = document.getElementById('session-list');
         sessions.forEach((s, idx) => {
             const div = document.createElement('div');
@@ -137,6 +150,22 @@
             updateUI();
         }
 
+        function skipExercise() {
+            currentIndex++;
+            if (currentIndex < currentExList.length) {
+                setupExercise();
+            } else {
+                finish();
+            }
+        }
+
+        function prevExercise() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                setupExercise();
+            }
+        }
+
         function toggleTimer() {
             if (timerId) {
                 clearInterval(timerId);
@@ -157,13 +186,8 @@
                     isWorking = true;
                     timeLeft = currentExList[currentIndex].work;
                 } else {
-                    currentIndex++;
-                    if (currentIndex < currentExList.length) {
-                        setupExercise();
-                    } else {
-                        finish();
-                        return;
-                    }
+                    skipExercise();
+                    return;
                 }
             }
             updateUI();
@@ -174,20 +198,4 @@
             document.getElementById('ex-name').innerText = ex.name;
             document.getElementById('ex-desc').innerText = ex.description;
             document.getElementById('phase').innerText = isWorking ? "EXERCISE" : "PREP";
-            document.getElementById('phase').style.color = isWorking ? "var(--accent)" : "var(--prep)";
-            document.getElementById('display').innerText = `00:${timeLeft.toString().padStart(2, '0')}`;
-            document.getElementById('progress').innerText = `Step ${currentIndex + 1} of ${currentExList.length}`;
-        }
-
-        function finish() {
-            clearInterval(timerId);
-            timerId = null;
-            document.getElementById('phase').innerText = "FINISHED";
-            document.getElementById('ex-name').innerText = "Session Complete";
-            document.getElementById('ex-desc').innerText = "Well done!";
-            document.getElementById('display').innerText = "00:00";
-            document.getElementById('startBtn').classList.add('hidden');
-        }
-    </script>
-</body>
-</html>
+            document.getElementById('phase').style.color =
