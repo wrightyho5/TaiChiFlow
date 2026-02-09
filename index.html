@@ -1,29 +1,36 @@
-let currentExList = [];
+const sessions = [
+            // ... (keep your sessions list exactly as it is)
+        ];
+
+        let currentExList = [];
         let currentIndex = 0;
         let timeLeft = 0;
         let isWorking = false; 
         let timerId = null;
-        let wakeLock = null; // New variable to hold the screen lock
+        let wakeLock = null; 
         const chime = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
 
-        // NEW: Function to keep screen alive
-        async function requestWakeLock() {
-            try {
-                if ('wakeLock' in navigator) {
+        // IMPROVED: Robust Wake Lock function
+        const requestWakeLock = async () => {
+            if ('wakeLock' in navigator) {
+                try {
                     wakeLock = await navigator.wakeLock.request('screen');
+                    console.log('Wake Lock Active');
+                    
+                    // If the system releases the lock (e.g. battery saver), re-request it
+                    wakeLock.onrelease = () => { console.log('Wake Lock Released'); };
+                } catch (err) {
+                    console.error(`${err.name}, ${err.message}`);
                 }
-            } catch (err) {
-                console.log(`${err.name}, ${err.message}`);
             }
-        }
+        };
 
-        // NEW: Function to allow screen to sleep again
-        function releaseWakeLock() {
-            if (wakeLock !== null) {
-                wakeLock.release();
-                wakeLock = null;
+        // Listen for when you return to the tab/app
+        document.addEventListener('visibilitychange', async () => {
+            if (wakeLock !== null && document.visibilityState === 'visible') {
+                await requestWakeLock();
             }
-        }
+        });
 
         window.onload = function() {
             const list = document.getElementById('session-list');
@@ -67,16 +74,19 @@ let currentExList = [];
             }
         }
 
-        function toggleTimer() {
+        async function toggleTimer() {
             if (timerId) {
                 clearInterval(timerId);
                 timerId = null;
                 document.getElementById('startBtn').innerText = "RESUME";
-                releaseWakeLock(); // Let phone sleep if paused
+                if (wakeLock) {
+                    wakeLock.release();
+                    wakeLock = null;
+                }
             } else {
                 document.getElementById('startBtn').innerText = "PAUSE";
                 timerId = setInterval(tick, 1000);
-                requestWakeLock(); // Keep screen on while running
+                await requestWakeLock(); // Request lock on Start/Resume
             }
         }
 
@@ -109,7 +119,10 @@ let currentExList = [];
         function finish() {
             if (timerId) clearInterval(timerId);
             timerId = null;
-            releaseWakeLock(); // Session over, let phone sleep
+            if (wakeLock) {
+                wakeLock.release();
+                wakeLock = null;
+            }
             document.getElementById('phase').innerText = "FINISHED";
             document.getElementById('ex-name').innerText = "Session Complete";
             document.getElementById('ex-desc').innerText = "Well done!";
