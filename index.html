@@ -86,6 +86,18 @@
                 ]
             },
             {
+                title: "7-Minute Tai Chi Routine",
+                exercises: [
+                    { name: "Hops", work: 45, prep: 5, description: "Lightly jumping up and down with relaxed shoulders." },
+                    { name: "Alternating Arms", work: 60, prep: 5, description: "Moving arms up and down in an alternating rhythm." },
+                    { name: "Dead Arms", work: 60, prep: 5, description: "Twisting shoulders with loose arms slapping the body." },
+                    { name: "Standing Prayer Twist", work: 60, prep: 5, description: "Twisting from left to right with prayer hands." },
+                    { name: "Bent Over Twist", work: 60, prep: 5, description: "Twisting 180 degrees looking down at the ground." },
+                    { name: "Marches", work: 60, prep: 5, description: "High-intensity marches, slapping kneecaps." },
+                    { name: "Body waves", work: 60, prep: 5, description: "Raising arms up and 'whooshing' them down." }
+                ]
+            },
+            {
                 title: "Full Flow Routine",
                 exercises: [
                     { name: "Hops", work: 30, prep: 5, description: "Lightly jumping up and down with relaxed shoulders." },
@@ -116,10 +128,9 @@
         let timerId = null;
         const chime = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
 
-        // This ensures the menu loads correctly when the page opens
         window.onload = function() {
             const list = document.getElementById('session-list');
-            list.innerHTML = ""; // Clear existing
+            list.innerHTML = "";
             sessions.forEach((s, idx) => {
                 const div = document.createElement('div');
                 div.className = 'menu-item';
