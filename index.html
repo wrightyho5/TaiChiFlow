@@ -1,132 +1,29 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TaiChiApp</title>
-    <style>
-        :root { --accent: #81C784; --prep: #FFB74D; --bg: #1A1A1A; --card: #2D2D2D; }
-        body { font-family: sans-serif; background: var(--bg); color: white; margin: 0; padding: 20px; text-align: center; }
-        .hidden { display: none !important; }
-        
-        /* Menu */
-        #session-list { margin-top: 20px; }
-        .menu-item { background: var(--card); padding: 25px; border-radius: 15px; margin-bottom: 15px; cursor: pointer; border: 1px solid #444; text-align: left; }
-        .menu-item h2 { margin: 0; color: var(--accent); font-size: 1.5rem; }
-        .menu-item p { margin: 5px 0 0; color: #888; font-size: 0.9rem; }
-        
-        /* Timer Screen */
-        #ex-name { font-size: 2.2rem; color: var(--accent); font-weight: bold; margin-top: 20px; line-height: 1.2; }
-        #ex-desc { font-size: 1.7rem; color: #FFF; font-style: italic; min-height: 4rem; margin-top: 15px; padding: 0 10px; line-height: 1.3; }
-        #phase { font-size: 1.5rem; letter-spacing: 2px; color: #888; margin-top: 15px; text-transform: uppercase; }
-        #display { font-size: 7rem; font-weight: bold; margin: 5px 0; font-variant-numeric: tabular-nums; }
-        
-        /* BIGGER PROGRESS TEXT */
-        #progress { font-size: 2.2rem; font-weight: bold; color: #FFF; margin: 15px 0; background: #333; padding: 10px; border-radius: 10px; }
-        
-        button { width: 100%; padding: 20px; font-size: 1.2rem; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; }
-        .btn-start { background: var(--accent); color: #1A1A1A; margin-top: 10px; }
-        .btn-back { background: #444; color: white; margin-top: 15px; }
-
-        /* Navigation Row */
-        .nav-row { display: flex; gap: 10px; margin-top: 15px; }
-        .btn-nav { background: #555; color: white; padding: 15px; font-size: 1.1rem; flex: 1; border: 1px solid #777; }
-    </style>
-</head>
-<body>
-
-    <div id="menu-screen">
-        <h1 style="margin-bottom: 30px;">Tai Chi Sessions</h1>
-        <div id="session-list"></div>
-    </div>
-
-    <div id="timer-screen" class="hidden">
-        <div id="ex-name">---</div>
-        <div id="ex-desc">---</div>
-        <div id="phase">GET READY</div>
-        <div id="display">00:00</div>
-        
-        <div id="progress">Step 1 of X</div>
-        
-        <button class="btn-start" id="startBtn" onclick="toggleTimer()">START SESSION</button>
-
-        <div class="nav-row" id="navRow">
-            <button class="btn-nav" onclick="prevExercise()">← PREV</button>
-            <button class="btn-nav" onclick="skipExercise()">SKIP →</button>
-        </div>
-
-        <button class="btn-back" onclick="location.reload()">BACK TO MENU</button>
-    </div>
-
-    <script>
-        const sessions = [
-            {
-                title: "9 Flow Routine",
-                exercises: [
-                    { name: "Up and Down Together", work: 30, prep: 5, description: "Rising up with the arms while simultaneously lifting up the calves." },
-                    { name: "Rising Knee Twist", work: 30, prep: 5, description: "Twisting motions while balancing on one side to get blood moving." },
-                    { name: "Golden Turtle", work: 30, prep: 5, description: "Wide stance; reach down to touch the alternate foot with the hand." },
-                    { name: "Bodyweight Lifts", work: 30, prep: 5, description: "Tilt hips back with arms forward, then thrust forward and rise onto calves." },
-                    { name: "Knee Bend Touches", work: 30, prep: 5, description: "Side lunge motion touching the alternate foot." },
-                    { name: "Torso Twist", work: 30, prep: 5, description: "Spin and look behind you with loose arms wrapping around the body." },
-                    { name: "Spread Your Wings", work: 30, prep: 5, description: "Move the arms in a backwards circular motion." },
-                    { name: "Squats", work: 30, prep: 5, description: "Drop down to a full 90-degree angle with a wide leg stance." },
-                    { name: "Forward Back Clap", work: 30, prep: 5, description: "Relaxed front-and-back clapping." }
-                ]
-            },
-            {
-                title: "Core",
-                exercises: [
-                    { name: "Plank", work: 60, prep: 5, description: "Normal Plank" },
-                    { name: "Side Plank L", work: 30, prep: 8, description: "Side Plank Left" },
-                    { name: "Side Plank R", work: 30, prep: 8, description: "Side Plank Right" },
-                    { name: "Superman 1", work: 15, prep: 5, description: "Supermans" },
-                    { name: "Superman 2", work: 15, prep: 4, description: "Supermans" },
-                    { name: "Superman 3", work: 15, prep: 4, description: "Supermans" },
-                    { name: "Push Ups", work: 90, prep: 5, description: "Goal: 40-50" }
-                ]
-            },
-            {
-                title: "7-Minute Tai Chi Routine",
-                exercises: [
-                    { name: "Hops", work: 45, prep: 5, description: "Lightly jumping up and down with relaxed shoulders." },
-                    { name: "Alternating Arms", work: 60, prep: 5, description: "Moving arms up and down in an alternating rhythm." },
-                    { name: "Dead Arms", work: 60, prep: 5, description: "Twisting shoulders with loose arms slapping the body." },
-                    { name: "Standing Prayer Twist", work: 60, prep: 5, description: "Twisting from left to right with prayer hands." },
-                    { name: "Bent Over Twist", work: 60, prep: 5, description: "Twisting 180 degrees looking down at the ground." },
-                    { name: "Marches", work: 60, prep: 5, description: "High-intensity marches, slapping kneecaps." },
-                    { name: "Body waves", work: 60, prep: 5, description: "Raising arms up and 'whooshing' them down." }
-                ]
-            },
-            {
-                title: "Full Flow Routine",
-                exercises: [
-                    { name: "Hops", work: 30, prep: 5, description: "Lightly jumping up and down with relaxed shoulders." },
-                    { name: "Alternating Arms", work: 45, prep: 5, description: "Moving arms up and down in an alternating rhythm." },
-                    { name: "Dead Arms", work: 45, prep: 5, description: "Twisting shoulders with loose arms slapping the body." },
-                    { name: "Prayer Twist", work: 30, prep: 5, description: "Twisting with prayer hands, head facing forward." },
-                    { name: "Pendulumns", work: 30, prep: 5, description: "Side bends, arms over head. Swing like a pendulumn." },
-                    { name: "Marches", work: 45, prep: 5, description: "High-intensity marches, slapping kneecaps." },
-                    { name: "Hand Throw Waves", work: 30, prep: 5, description: "Raising arms up and 'whooshing' them down." },
-                    { name: "Rising Knee 1", work: 20, prep: 5, description: "Twisting motions balancing on one side." },
-                    { name: "Rising Knee 2", work: 20, prep: 2, description: "Other side" },
-                    { name: "Golden Turtle", work: 30, prep: 5, description: "Wide stance; touch alternate foot." },
-                    { name: "Bodyweight Lifts", work: 30, prep: 8, description: "Tilt hips back, thrust forward onto calves." },
-                    { name: "Torso Twist", work: 30, prep: 5, description: "Spin and look behind you with loose arms." },
-                    { name: "Spread Your Wings", work: 30, prep: 5, description: "Move the arms in a backwards circular motion." },
-                    { name: "Squats", work: 30, prep: 7, description: "Full 90-degree angle with a wide leg stance." },
-                    { name: "Golf Swing", work: 30, prep: 5, description: "Golf swings, knee slight bend and twist." },
-                    { name: "Bent Over Twist", work: 30, prep: 5, description: "Twisting 180 degrees looking at the ground." },
-                    { name: "Forward Back Clap", work: 30, prep: 5, description: "Relaxed front-and-back clapping." }
-                ]
-            }
-        ];
-
-        let currentExList = [];
+let currentExList = [];
         let currentIndex = 0;
         let timeLeft = 0;
         let isWorking = false; 
         let timerId = null;
+        let wakeLock = null; // New variable to hold the screen lock
         const chime = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
+
+        // NEW: Function to keep screen alive
+        async function requestWakeLock() {
+            try {
+                if ('wakeLock' in navigator) {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                }
+            } catch (err) {
+                console.log(`${err.name}, ${err.message}`);
+            }
+        }
+
+        // NEW: Function to allow screen to sleep again
+        function releaseWakeLock() {
+            if (wakeLock !== null) {
+                wakeLock.release();
+                wakeLock = null;
+            }
+        }
 
         window.onload = function() {
             const list = document.getElementById('session-list');
@@ -175,9 +72,11 @@
                 clearInterval(timerId);
                 timerId = null;
                 document.getElementById('startBtn').innerText = "RESUME";
+                releaseWakeLock(); // Let phone sleep if paused
             } else {
                 document.getElementById('startBtn').innerText = "PAUSE";
                 timerId = setInterval(tick, 1000);
+                requestWakeLock(); // Keep screen on while running
             }
         }
 
@@ -210,6 +109,7 @@
         function finish() {
             if (timerId) clearInterval(timerId);
             timerId = null;
+            releaseWakeLock(); // Session over, let phone sleep
             document.getElementById('phase').innerText = "FINISHED";
             document.getElementById('ex-name').innerText = "Session Complete";
             document.getElementById('ex-desc').innerText = "Well done!";
@@ -217,6 +117,3 @@
             document.getElementById('startBtn').classList.add('hidden');
             document.getElementById('navRow').classList.add('hidden');
         }
-    </script>
-</body>
-</html>
